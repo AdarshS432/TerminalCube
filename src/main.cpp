@@ -13,13 +13,9 @@ int main() {
     Cube cube = Cube(size);
     Algorithm_Reader alg = Algorithm_Reader();
     std::string input;
-    //cube.printFace(cube.getFaceColors(Enums::FaceEnum::RIGHT));
     cube.print();
-    //alg.parse("R U R' U' R' F R2 U' R' U' R U R' F'", cube);
-    //cube.print();
     while(true) {
         std::cout<<"Enter Algorithm: ";
-        //std::cin.get();
         std::getline(std::cin>>std::ws, input);
         std::cout<<std::endl;
         if(input == "quit") break;
