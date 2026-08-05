@@ -20,15 +20,22 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/fmtlib/fmt.git 
     GIT_TAG 12.2.0
 )
+set(FMT_HEADER_ONLY ON CACHE INTERNAL "FMT: Force header only")
+set(FMT_MODULE OFF CACHE INTERNAL "FMT: Disable experimental modules")
+
 FetchContent_MakeAvailable(eigen)
 FetchContent_MakeAvailable(fmt)
 
+#file(COPY "${eigen_SOURCE_DIR}/Eigen" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_library(TCube STATIC src/Cube.cpp src/Algorithm_Reader.cpp)
+
 target_include_directories(TCube PUBLIC 
 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+$<BUILD_INTERFACE:${eigen_SOURCE_DIR}>
 $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(TCube PUBLIC eigen fmt)
+target_link_libraries(TCube PUBLIC eigen fmt::fmt)
 target_compile_features(TCube PRIVATE cxx_std_23)
 
 if(BUILD_APP) 
