@@ -35,7 +35,7 @@ $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 $<BUILD_INTERFACE:${eigen_SOURCE_DIR}>
 $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(TCube PUBLIC eigen fmt::fmt)
+target_link_libraries(TCube PUBLIC eigen fmt::fmt-header-only)
 target_compile_features(TCube PRIVATE cxx_std_23)
 
 if(BUILD_APP) 
