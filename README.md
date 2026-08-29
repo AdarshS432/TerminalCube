@@ -1,6 +1,6 @@
 # TerminalCube
 
-TerminalCube is an NxNxN Rubik's Cube Simulator that can be used in the terminal with a C++ library for easy use in projects.
+TerminalCube (TCube) is an NxNxN Rubik's Cube Simulator that can be used in the terminal with a C++ library for easy use in projects.
 
 
 
@@ -50,3 +50,14 @@ target_link_libraries(MyProject PRIVATE TCube)
 NOTE: Make sure to replace `MyProject` with your project name, `main.cpp` with your source files. The `PRIVATE` keyword can be changed to `PUBLIC` or `INTERFACE` depending on your project's dependencies.
 
 # The Mathematics
+
+TCube uses vectors to represent the pieces on any Rubik's cube.
+
+### The Coordinate System:
+Right: +x
+Up: +y
+Forward: +z
+
+The middle layer (or the layer between the two middle layers on even numbered cubes) will be considered the 'zero-layer'.
+
+NOTE: In a physical even-numbered Rubik's Cube, the 'zero-layer' actually exists under the edges in the center, but it is effectively ignored in this simulation, as it does not change the process in calculating the positions of pieces. 
