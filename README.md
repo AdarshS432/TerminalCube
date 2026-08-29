@@ -33,3 +33,20 @@ Prime is shown by the symbol " ' ". If a move is prime, it is rotated counterclo
 Example: 3Rw2'
 
 How to Use (Library):
+- Build the project (for instructions see above).
+- To compile your program using the library, run the command:
+    `g++ [YOUR_PROJECT_SOURCE_FILES] -o [YOUR_OUTPUT_EXECUTABLE_NAME] -lTCube -L path/to/build/[YOUR_PRESET] -I path/to/include/`
+- NOTE: If using MSVC on Windows, use this command:
+    `cl.exe [YOUR_PROJECT_SOURCE_FILES] /Fe:[YOUR_OUTPUT_EXECUTABLE_NAME] /I path/to/include/ /link /LIBPATH:path/to/build/[YOUR_PRESET] TCube.lib`
+
+If using CMake:
+```cmake
+add_subdirectory([PATH_TO_CLONED_TCUBE_DIRECTORY])
+
+add_executable(MyProject main.cpp)
+
+target_link_libraries(MyProject PRIVATE TCube)
+```
+NOTE: Make sure to replace `MyProject` with your project name, `main.cpp` with your source files. The `PRIVATE` keyword can be changed to `PUBLIC` or `INTERFACE` depending on your project's dependencies.
+
+# The Mathematics
