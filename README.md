@@ -61,3 +61,58 @@ Forward: +z
 The middle layer (or the layer between the two middle layers on even numbered cubes) will be considered the 'zero-layer'.
 
 NOTE: In a physical even-numbered Rubik's Cube, the 'zero-layer' actually exists under the edges in the center, but it is effectively ignored in this simulation, as it does not change the process in calculating the positions of pieces. 
+
+### Rotation and Piece Movement
+
+Since each piece is represented by a vector, rotating a set of pieces becomes easy due to rotation matrices. When any move is executed, the affected pieces are chosen, and their position vectors will then be multiplied by the rotation matrix.
+
+Example:
+Vector: 
+$
+\langle
+1, 1, 1
+\rangle
+$
+"Right, Top, Front" corner
+Move: R (Clockwise rotation around +x axis)
+
+Rotation Matrix: 
+$
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos(\theta) & -\sin(\theta) \\
+0 & \sin(\theta) & \cos(\theta)
+\end{bmatrix}
+$
+
+### Multiplication:
+
+$\theta = -90^\circ$ (Because Counterclockwise is usually $+\theta$)
+
+$$
+\begin{aligned}
+& \begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos(-90^\circ) & -\sin(-90^\circ) \\
+0 & \sin(-90^\circ) & \cos(-90^\circ)
+\end{bmatrix}
+
+\begin{bmatrix}
+1 \\ 1 \\ 1
+\end{bmatrix}
+
+=
+\begin{bmatrix}
+1 \\ 1 \\ -1
+\end{bmatrix}
+& \hspace{50em}
+\end{aligned}
+$$
+
+The final vector: 
+$
+\langle
+1, 1, 1
+\rangle
+$
+represents the "Right, Top, Back" corner, which would be the location of the piece if that move was performed.
