@@ -68,29 +68,24 @@ Since each piece is represented by a vector, rotating a set of pieces becomes ea
 
 Example:
 Vector: 
-$
-\langle
+$\langle
 1, 1, 1
-\rangle
-$
+\rangle$
 "Right, Top, Front" corner
 Move: R (Clockwise rotation around +x axis)
 
 Rotation Matrix: 
-$
-\begin{bmatrix}
+$\begin{bmatrix}
 1 & 0 & 0 \\
 0 & \cos(\theta) & -\sin(\theta) \\
 0 & \sin(\theta) & \cos(\theta)
-\end{bmatrix}
-$
+\end{bmatrix}$
 
 ### Multiplication:
 
 $\theta = -90^\circ$ (Because Counterclockwise is usually $+\theta$)
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 & \begin{bmatrix}
 1 & 0 & 0 \\
 0 & \cos(-90^\circ) & -\sin(-90^\circ) \\
@@ -106,13 +101,10 @@ $$
 1 \\ 1 \\ -1
 \end{bmatrix}
 & \hspace{50em}
-\end{aligned}
-$$
+\end{aligned}$$
 
 The final vector: 
-$
-\langle
+$\langle
 1, 1, 1
-\rangle
-$
+\rangle$
 represents the "Right, Top, Back" corner, which would be the location of the piece if that move was performed.
