@@ -190,6 +190,7 @@ class Cube {
         std::vector<std::vector<string>> getFaceColors(Enums::FaceEnum face);
         void rotateFace(Enums::FaceEnum face, int amount);
         void rotateLayer(Enums::FaceEnum face, int depth, int amount);
+        void replacePieces(pieces::Piece& piece);
 
         void reset();
     private:

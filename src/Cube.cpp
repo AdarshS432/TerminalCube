@@ -119,6 +119,14 @@ auto roundVector(Eigen::Vector3f v) {
         std::round(v.z())
     );
 }
+void Cube::replacePieces(Piece& piece) {
+    Piece& temp = *Pieces[piece.position.x() - minpoint][piece.position.y() - minpoint][piece.position.z() - minpoint];
+    if(temp.ID == piece.ID) {
+        return;
+    }
+    Pieces[piece.position.x() - minpoint][piece.position.y() - minpoint][piece.position.z() - minpoint] = std::make_unique<Piece>(piece);
+    replacePieces(temp);
+}
 void Cube::rotatePiece(Piece& piece, Eigen::Matrix3f rotationMatrix) {
     piece.position = roundVector(rotationMatrix * piece.position);
     if(auto* corner = dynamic_cast<Corner*>(&piece)) {
@@ -178,6 +186,8 @@ void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
     for(Piece* p : targets) {
         rotatePiece(*p, rot);
     }
+    Piece* p0 = targets.front();
+    replacePieces(*p0);
 }
 void Cube::rotateFace(Enums::FaceEnum face, int amount) {
     //std::cout<<"Rotating Pieces"<<std::endl;
@@ -186,12 +196,15 @@ void Cube::rotateFace(Enums::FaceEnum face, int amount) {
     float angle = (float)90.0f*amount * (std::numbers::pi / 180.0f);
 
     Eigen::Matrix3f rotationMatrix = buildRotationMatrix(desirednormal, angle);
+
+    Piece* p0 = nullptr;
     
     for (size_t i = 0; i < Pieces.size(); i++) { //X
         for (size_t j = 0; j < Pieces.size(); j++) { //Y
             for(size_t k = 0; k < Pieces.size(); k++) { //Z
                 if(!Pieces[i][j][k]) continue;
                 Piece* p = Pieces[i][j][k].get();
+                if(p0 == nullptr) p0 = p;
 
                 if(face == TOP && p->position.y() != maxpoint) continue;
                 if(face == BOTTOM && p->position.y() != minpoint) continue;
@@ -204,6 +217,7 @@ void Cube::rotateFace(Enums::FaceEnum face, int amount) {
             }
         }
     }
+    replacePieces(*p0);
 }
 
 
@@ -232,7 +246,7 @@ std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) {
     int b0 = 0;
     for (int i = minpoint; i <= maxpoint; i++) { //Rows
         b0 = 0;
-        if(i == 0 && cubesize % 2 == 0) continue;
+       if(i == 0 && cubesize % 2 == 0) continue;
         for (int j = minpoint; j <= maxpoint; j++) { //Columns
             if(j == 0 && cubesize % 2 == 0) continue;
             Eigen::Vector3f pos;
