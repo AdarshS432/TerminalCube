@@ -75,13 +75,19 @@ $\langle
 Move: R (Clockwise rotation around +x axis)
 
 Rotation Matrix: 
-<img align="middle" src="images/RotationMatrix.png">
+<picture>
+    <source align="middle" srcset="images/RotationMatrix_Dark.png" media="(prefers-color-scheme: dark)">
+    <img align="middle" src="images/RotationMatrix.png">
+</picture>
 
 ### Multiplication:
 
 $\theta = -90^\circ$ (Because Counterclockwise is usually $+\theta$)
 
-<img align="middle" src="images/Solution.png">
+<picture>
+    <source align="middle" srcset="images/Solution_Dark.png" media="(prefers-color-scheme: dark)">
+    <img align="middle" src="images/Solution.png">
+</picture>
 
 The final vector: 
 $\langle
