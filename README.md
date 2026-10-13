@@ -75,38 +75,41 @@ $\langle
 Move: R (Clockwise rotation around +x axis)
 
 Rotation Matrix: 
-$\begin{bmatrix}
-1 & 0 & 0 \\
-0 & \cos(\theta) & -\sin(\theta) \\
-0 & \sin(\theta) & \cos(\theta)
-\end{bmatrix}$
+<img align="middle" src="images/RotationMatrix.png">
 
 ### Multiplication:
 
 $\theta = -90^\circ$ (Because Counterclockwise is usually $+\theta$)
 
-$$
-\begin{aligned}
-& \begin{bmatrix}
-1 & 0 & 0 \\
-0 & \cos(-90^\circ) & -\sin(-90^\circ) \\
-0 & \sin(-90^\circ) & \cos(-90^\circ)
-\end{bmatrix}
-
-\begin{bmatrix}
-1 \\ 1 \\ 1
-\end{bmatrix}
-
-=
-\begin{bmatrix}
-1 \\ 1 \\ -1
-\end{bmatrix}
-& \hspace{50em}
-\end{aligned}
-$$
+<img align="middle" src="images/Solution.png">
 
 The final vector: 
 $\langle
 1, 1, 1
 \rangle$
 represents the "Right, Top, Back" corner, which would be the location of the piece if that move was performed.
+
+### Piece Colors:
+
+The colors of the pieces can also be computed using the same method. Each color on a piece is given a normal vector, indicating the direction it is pointing in. When rotated, this direction vector is multiplied, and the product is the new normal vector. 
+
+A normal vector is a unit vector perpendicular to a surface. 
+Ex.
+$\langle
+0, 0, 1
+\rangle$
+represents a color that is facing the +Z direction. If this piece is affected by the move shown in the previous sections ("R"), its new normal vector would be: $\langle 0, 1, 0 \rangle$, which points up. 
+
+### Corner Orientation
+
+On any Rubik's Cube, one can assign two colors on opposite sides of a cube to be the main colors used when solving. Usually, these tend to be white and yellow, but they can vary depending on the skill level and preference of the solver. The orientation of a corner depends on the direction in which these pieces are pointing in. 
+
+Corners are assigned a value between 0 and 2, describing their orientation. In a solved cube, every corner will be in the orientation 0, and in every cube that can be solved, the sum of the orientations wil be a multiple of 3. 
+
+### Edge Orientation
+
+Similar to corners, edges (pieces between corners) will also be assigned an orientation based on the main colors. (Also usually white or yellow). However, some edges may not have the main colors on them (e.g. Blue Orange), in which case the main color would be the color of the side facing the solver. 
+
+### Important note on Algorithms
+
+TCube uses both $O(n^2)$ and $O(n^3)$ algorithms to locate pieces (to print or rotate). These algorithms are sometimes time consuming, especially for larger cubes. Please use common sense when simulating a cube, and keep the hardware restrictions of your device in mind. 
