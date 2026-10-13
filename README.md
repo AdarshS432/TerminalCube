@@ -85,7 +85,8 @@ $\begin{bmatrix}
 
 $\theta = -90^\circ$ (Because Counterclockwise is usually $+\theta$)
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 & \begin{bmatrix}
 1 & 0 & 0 \\
 0 & \cos(-90^\circ) & -\sin(-90^\circ) \\
@@ -101,7 +102,8 @@ $$\begin{aligned}
 1 \\ 1 \\ -1
 \end{bmatrix}
 & \hspace{50em}
-\end{aligned}$$
+\end{aligned}
+$$
 
 The final vector: 
 $\langle
