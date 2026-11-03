@@ -120,26 +120,10 @@ auto roundVector(Eigen::Vector3f v) {
         std::round(v.z())
     );
 }
-void Cube::replacePieces(Piece& piece) {
-    size_t x = static_cast<int>(piece.position.x() - minpoint);
-    size_t y = static_cast<int>(piece.position.y() - minpoint);
-    size_t z = static_cast<int>(piece.position.z() - minpoint);
 
-    std::unique_ptr<Piece> temp = std::move(Pieces.at(Eigen::Vector3f(x, y, z)));
-
-    if(temp == nullptr) {
-        Pieces[Eigen::Vector3f(x, y, z)] = piece.clone();
-        return;
-    }
-    if(temp->ID == piece.ID) {
-        Pieces[Eigen::Vector3f(x, y, z)] = std::move(temp);
-        return;
-    }
-    Pieces[Eigen::Vector3f(x, y, z)] = piece.clone();
-    replacePieces(*temp);
-}
 void Cube::rotatePiece(Piece& piece, Eigen::Matrix3f rotationMatrix) {
     piece.position = roundVector(rotationMatrix * piece.position);
+    std::cout<<"Position After Rotation: "<<piece.position<<std::endl;
     if(auto* corner = dynamic_cast<Corner*>(&piece)) {
         for (int i = 0; i < 3; ++i) {
             corner->tileVectors[i] = roundVector(rotationMatrix * corner->tileVectors[i]);
@@ -155,7 +139,7 @@ void Cube::rotatePiece(Piece& piece, Eigen::Matrix3f rotationMatrix) {
     }
 }
 void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
-
+    std::cout<<"Rotating Layer"<<std::endl;
     Eigen::Vector3f normal = Enums::FaceNormals.at(face);
     float dir = normal.x() + normal.y() + normal.z();
 
@@ -166,42 +150,33 @@ void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
     float angle = (float)90.0f*amount * (std::numbers::pi / 180.0f);
     Eigen::Matrix3f rot = buildRotationMatrix(normal, angle);
 
-    std::vector<Piece*> targets;
+    std::vector<Eigen::Vector3f> targets;
     if(face == Enums::FaceEnum::RIGHT || face == Enums::FaceEnum::LEFT) {
         for(int j = minpoint; j <= maxpoint; j++) {
             for(int k = minpoint; k <= maxpoint; k++) {
-                Piece* p = getPieceAtPosition(Eigen::Vector3f(pos, j, k));
-                if(p == nullptr) continue;
-                targets.push_back(p);
+                targets.push_back(Eigen::Vector3f(pos, j, k));
             }
         }
     }
     if(face == Enums::FaceEnum::FRONT || face == Enums::FaceEnum::BACK) {
         for(int j = minpoint; j <= maxpoint; j++) {
             for(int k = minpoint; k <= maxpoint; k++) {
-                Piece* p = getPieceAtPosition(Eigen::Vector3f(j, k, pos));
-                if(p == nullptr) continue;
-                targets.push_back(p);
+                targets.push_back(Eigen::Vector3f(j, k, pos));
             }
         }
     }
     if(face == Enums::FaceEnum::TOP || face == Enums::FaceEnum::BOTTOM) {
         for(int j = minpoint; j <= maxpoint; j++) {
             for(int k = minpoint; k <= maxpoint; k++) {
-                Piece* p = getPieceAtPosition(Eigen::Vector3f(j, pos, k));
-                if(p == nullptr) continue;
-                targets.push_back(p);
+                targets.push_back(Eigen::Vector3f(j, pos, k));
             }
         }
     }
-    for(Piece* p : targets) {
-        rotatePiece(*p, rot);
-    }
-    Piece* p0 = targets.front();
-    replacePieces(*p0);
+
+    replaceTargets(targets, rot);
 }
 void Cube::rotateFace(Enums::FaceEnum face, int amount) {
-    //std::cout<<"Rotating Pieces"<<std::endl;
+    std::cout<<"Rotating Face"<<std::endl;
 
     Eigen::Vector3f desirednormal = FaceNormals.at(face);
     float angle = (float)90.0f*amount * (std::numbers::pi / 180.0f);
@@ -209,56 +184,53 @@ void Cube::rotateFace(Enums::FaceEnum face, int amount) {
     Eigen::Matrix3f rotationMatrix = buildRotationMatrix(desirednormal, angle);
 
     Piece* p0 = nullptr;
-    
-    /*for (size_t i = 0; i < cubesize; i++) { //X
-        for (size_t j = 0; j < cubesize; j++) { //Y
-            for(size_t k = 0; k < cubesize; k++) { //Z
-                if(!Pieces[i][j][k]) continue;
-                Piece* p = Pieces[i][j][k].get();
-                if(p0 == nullptr) p0 = p;
 
-                if(face == TOP && p->position.y() != maxpoint) continue;
-                if(face == BOTTOM && p->position.y() != minpoint) continue;
-                if(face == FRONT && p->position.z() != maxpoint) continue;
-                if(face == BACK && p->position.z() != minpoint) continue;
-                if(face == RIGHT && p->position.x() != maxpoint) continue;
-                if(face == LEFT && p->position.x() != minpoint) continue;
-
-                rotatePiece(*Pieces[i][j][k], rotationMatrix);
-            }
-        }
-    }*/
-    for (size_t i = minpoint; i < maxpoint; i++) { //X
-        for (size_t j = minpoint; j < maxpoint; j++) { //Y
-            if(i == 0 && cubesize % 2 == 0) continue;
+   std::vector<Eigen::Vector3f> targets;
+    for (int i = minpoint; i <= maxpoint; i++) { //X
+        if(i == 0 && cubesize % 2 == 0) continue;
+        for (int j = minpoint; j <= maxpoint; j++) { //Y
             if(j == 0 && cubesize % 2 == 0) continue;
+            Eigen::Vector3f vect;
             if(face == TOP) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(i, maxpoint, j)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(i, maxpoint, j)), rotationMatrix);
+                vect = Eigen::Vector3f(i, maxpoint, j);
             }
             if(face == BOTTOM) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(i, minpoint, j)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(i, minpoint, j)), rotationMatrix);
+                vect = Eigen::Vector3f(i, minpoint, j);
             }
             if(face == FRONT) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(i, j, maxpoint)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(i, j, maxpoint)), rotationMatrix);
+                vect = Eigen::Vector3f(i, j, maxpoint);
             }
             if(face == BACK) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(i, j, minpoint)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(i, j, minpoint)), rotationMatrix);
+                vect = Eigen::Vector3f(i, j, minpoint);
             }
             if(face == RIGHT) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(maxpoint, i, j)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(maxpoint, i, j)), rotationMatrix);
+                vect = Eigen::Vector3f(maxpoint, i, j);
             }
             if(face == LEFT) {
-                if(p0 == nullptr) p0 = Pieces.at(Eigen::Vector3f(minpoint, i, j)).get();
-                rotatePiece(*Pieces.at(Eigen::Vector3f(minpoint, i, j)), rotationMatrix);
+                vect = Eigen::Vector3f(minpoint, i, j);
             }
+
+            targets.push_back(vect);
         }
     }
-    replacePieces(*p0);
+
+    replaceTargets(targets, rotationMatrix);
+}
+void Cube::replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f rotationMatrix) {
+    std::vector<std::unique_ptr<Piece>> selected;
+    selected.reserve(targets.size());
+    for(Eigen::Vector3f pos : targets) {
+        auto it = Pieces.find(pos);
+        if(it == Pieces.end()) continue;
+        selected.push_back(std::move(it->second));
+        Pieces.erase(it);
+    }
+    for(auto& p : selected) {
+        rotatePiece(*p, rotationMatrix);
+    }
+    for(auto& p : selected) {
+        Pieces.insert_or_assign(p->position, std::move(p));
+    }
 }
 
 
@@ -266,23 +238,7 @@ float Cube::getSize() {
     return cubesize;
 }
 Piece* Cube::getPieceAtPosition(Eigen::Vector3f pos) {
-    /*std::cout<<"Getting Piece At Position: "<<pos<<std::endl;
-    for (size_t i = 0; i < cubesize; i++) { //X
-        for (size_t j = 0; j < cubesize; j++) { //Y
-            for(size_t k = 0; k < cubesize; k++) { //Z
-                if(Pieces[i][j][k] && Pieces[i][j][k]->position.isApprox(pos)) {
-                    return Pieces[i][j][k].get();
-                }
-            }
-        }
-    }
-    return nullptr;*/
     return Pieces.at(pos).get();
-    /*int i = static_cast<int>(std::round(pos.x())) - minpoint;
-    int j = static_cast<int>(std::round(pos.y())) - minpoint;
-    int k = static_cast<int>(std::round(pos.z())) - minpoint;
-    //std::cout<<"Coordinates: "<<i<<", "<<j<<", "<<k<<std::endl;
-    return Pieces[i][j][k].get();*/
 }
 std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) {
     std::vector<std::vector<string>> colors(cubesize, std::vector<string>(cubesize, ""));
@@ -347,7 +303,7 @@ void Cube::printFace(std::vector<std::vector<string>> facedata) {
         for(size_t j = 0; j < facedata[i].size(); j++) {
             string color = facedata[i][j];
             if(!facetofmt.contains(color)) {
-                std::cerr<<"Key: "<<color<<" Not Found"<<std::endl;
+                std::cerr<<"Key: "<<color<<" Not Found At: "<<i<<","<<j<<std::endl;
                 fmt::print(fmt::fg(facetofmt.at("Gray")), "{}{}", PIECE_CHAR, PIECE_SEPARATOR);
                 if((int)(j+1) % cubesize == 0) fmt::print(FACE_SEPARATOR);
             } else {
@@ -361,8 +317,7 @@ void Cube::printFace(std::vector<std::vector<string>> facedata) {
 
 void Cube::print() { 
     string padding(cubesize * 2 + strlen(FACE_SEPARATOR), ' ');
-    //std::vector<std::vector<std::vector<string>>> Faces;
-    //Faces.push_back(getFaceColors(TOP));
+
     auto top = getFaceColors(TOP);
     for(int i = 0; i < cubesize; i++) {
         fmt::print("{}", padding);
@@ -393,13 +348,6 @@ void Cube::print() {
     }
 }
 void Cube::reset() {
-    /*for (int i = 0; i < cubesize; ++i) {
-        for (int j = 0; j < cubesize; ++j) {
-            for (int k = 0; k < cubesize; ++k) {
-                Pieces[i][j][k] = nullptr;
-            }
-        }
-    }*/
    Pieces.clear();
     array<float, 4> values = {
         (float)cubesize, 
