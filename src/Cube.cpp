@@ -123,7 +123,7 @@ auto roundVector(Eigen::Vector3f v) {
 
 void Cube::rotatePiece(Piece& piece, Eigen::Matrix3f rotationMatrix) {
     piece.position = roundVector(rotationMatrix * piece.position);
-    std::cout<<"Position After Rotation: "<<piece.position<<std::endl;
+    //std::cout<<"Position After Rotation: "<<piece.position<<std::endl;
     if(auto* corner = dynamic_cast<Corner*>(&piece)) {
         for (int i = 0; i < 3; ++i) {
             corner->tileVectors[i] = roundVector(rotationMatrix * corner->tileVectors[i]);
@@ -139,7 +139,7 @@ void Cube::rotatePiece(Piece& piece, Eigen::Matrix3f rotationMatrix) {
     }
 }
 void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
-    std::cout<<"Rotating Layer"<<std::endl;
+    //std::cout<<"Rotating Layer"<<std::endl;
     Eigen::Vector3f normal = Enums::FaceNormals.at(face);
     float dir = normal.x() + normal.y() + normal.z();
 
@@ -176,7 +176,7 @@ void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
     replaceTargets(targets, rot);
 }
 void Cube::rotateFace(Enums::FaceEnum face, int amount) {
-    std::cout<<"Rotating Face"<<std::endl;
+    //std::cout<<"Rotating Face"<<std::endl;
 
     Eigen::Vector3f desirednormal = FaceNormals.at(face);
     float angle = (float)90.0f*amount * (std::numbers::pi / 180.0f);
