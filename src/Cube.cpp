@@ -4,6 +4,8 @@
 #include <cmath>
 #include <numbers>
 
+#include <mutex>
+
 #include <fmt/core.h>
 #include <fmt/color.h>
 
@@ -172,8 +174,12 @@ void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
             }
         }
     }
-
     replaceTargets(targets, rot);
+    if(update_external_state) {
+        std::lock_guard<std::mutex> lock(state_lock);
+        auto state_list = this->clone_state(this->states);
+        states.insert_or_assign(states.size(), std::move(state_list.at(state_list.size()-1)));
+    }
 }
 void Cube::rotateFace(Enums::FaceEnum face, int amount) {
     //std::cout<<"Rotating Face"<<std::endl;
@@ -213,8 +219,12 @@ void Cube::rotateFace(Enums::FaceEnum face, int amount) {
             targets.push_back(vect);
         }
     }
-
     replaceTargets(targets, rotationMatrix);
+    if(update_external_state) {
+        std::lock_guard<std::mutex> lock(state_lock);
+        auto state_list = this->clone_state(this->states);
+        states.insert_or_assign(states.size(), std::move(state_list.at(state_list.size()-1)));
+    }
 }
 void Cube::replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f rotationMatrix) {
     std::vector<std::unique_ptr<Piece>> selected;
@@ -393,5 +403,39 @@ void Cube::reset() {
                 Pieces.insert_or_assign(piece->position, std::move(piece));
             }
         }
+    }
+}
+using piece_map = std::unordered_map<Eigen::Vector3f, std::unique_ptr<pieces::Piece>, matrix_hash<Eigen::Vector3f>>;
+piece_map clone_piece_map(const piece_map& pieces) {
+    piece_map piece_clones;
+    for (const auto& [element, piece] : pieces) {
+        if(piece) {
+            piece_clones[element] = piece->clone();
+        } else {
+            piece_clones[element] = nullptr;
+        }
+    }
+    return std::move(piece_clones);
+}
+std::unordered_map<int, piece_map> Cube::clone_state(std::unordered_map<int, piece_map>& states) {
+    std::unordered_map<int, piece_map> state_clones;
+    state_clones.reserve(states.size());
+    for (const auto& [index, state] : states) {
+        state_clones.emplace(index, clone_piece_map(state));
+    }
+    return state_clones;
+}
+std::unordered_map<int, piece_map> Cube::get_states() {
+    std::lock_guard<std::mutex> lock(state_lock);
+    return clone_state(states);
+}
+void Cube::set_state(piece_map& state) {
+    this->Pieces = clone_piece_map(state);
+}
+void Cube::update_state_on_turns() {
+    std::lock_guard<std::mutex> lock(state_lock);
+    if (!update_external_state) {
+        update_external_state = true;
+        states.emplace(0, clone_piece_map(Pieces));
     }
 }

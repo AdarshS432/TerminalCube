@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include <mutex>
+
 #include <fmt/core.h>
 
 using namespace std;
@@ -87,7 +89,7 @@ namespace pieces {
             position = piecePosition;
             ID = pieceID;
         }
-        Piece();
+        Piece() = default;
         virtual std::unique_ptr<Piece> clone() const {
             return std::make_unique<Piece>(*this);
         }
@@ -210,7 +212,8 @@ class Cube {
         Cube();
         float getSize();
         //std::vector<std::vector<std::vector<std::unique_ptr<pieces::Piece>>>> Pieces;
-        std::unordered_map<Eigen::Vector3f, std::unique_ptr<pieces::Piece>, matrix_hash<Eigen::Vector3f>> Pieces;
+        using piece_map = std::unordered_map<Eigen::Vector3f, std::unique_ptr<pieces::Piece>, matrix_hash<Eigen::Vector3f>>;
+        piece_map Pieces;
 
         void print();
         void printFace(std::vector<std::vector<string>> facedata);
@@ -220,9 +223,20 @@ class Cube {
         void replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f rotationMatrix);
         void replacePieces(pieces::Piece& piece);
 
+        std::unordered_map<int, piece_map> get_states();
+        void set_state(piece_map& state);
+
+        void update_state_on_turns();
+
         void reset();
     private:
+        bool update_external_state = false;
+        std::unordered_map<int, piece_map> states;
+        std::mutex state_lock;
+
         Eigen::Matrix3f buildRotationMatrix(Eigen::Vector3f axis, float angle);
         void rotatePiece(pieces::Piece& piece, Eigen::Matrix3f rotationMatrix);
         pieces::Piece* getPieceAtPosition(Eigen::Vector3f pos);
+
+        std::unordered_map<int, piece_map> clone_state(std::unordered_map<int, piece_map>& pieces);
 };
