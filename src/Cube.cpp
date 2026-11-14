@@ -298,7 +298,7 @@ std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) {
     return colors;
 }
 
-void Cube::printFace(std::vector<std::vector<string>> facedata) {
+void Cube::printFace(std::vector<std::vector<string>> facedata, bool color_enabled) {
     //std::cout<<"Printing Face Data"<<std::endl;
     std::unordered_map<string, fmt::color> facetofmt = {
         {"Yellow", fmt::color::yellow},
@@ -312,12 +312,17 @@ void Cube::printFace(std::vector<std::vector<string>> facedata) {
     for(size_t i = 0; i < facedata.size(); i++) {
         for(size_t j = 0; j < facedata[i].size(); j++) {
             string color = facedata[i][j];
-            if(!facetofmt.contains(color)) {
-                std::cerr<<"Key: "<<color<<" Not Found At: "<<i<<","<<j<<std::endl;
-                fmt::print(fmt::fg(facetofmt.at("Gray")), "{}{}", PIECE_CHAR, PIECE_SEPARATOR);
-                if((int)(j+1) % cubesize == 0) fmt::print(FACE_SEPARATOR);
+            if(color_enabled) {
+                if(!facetofmt.contains(color)) {
+                    std::cerr<<"Key: "<<color<<" Not Found At: "<<i<<","<<j<<std::endl;
+                    fmt::print(fmt::fg(facetofmt.at("Gray")), "{}{}", PIECE_CHAR, PIECE_SEPARATOR);
+                    if((int)(j+1) % cubesize == 0) fmt::print(FACE_SEPARATOR);
+                } else {
+                    fmt::print(fmt::fg(facetofmt.at(color)), "{}{}", PIECE_CHAR, PIECE_SEPARATOR);
+                    if((int)(j+1) % cubesize == 0) fmt::print(FACE_SEPARATOR);
+                }
             } else {
-                fmt::print(fmt::fg(facetofmt.at(color)), "{}{}", PIECE_CHAR, PIECE_SEPARATOR);
+                fmt::print(fmt::text_style(), "{}{}", color.front(), PIECE_SEPARATOR);
                 if((int)(j+1) % cubesize == 0) fmt::print(FACE_SEPARATOR);
             }
         }
@@ -325,13 +330,13 @@ void Cube::printFace(std::vector<std::vector<string>> facedata) {
     }
 }
 
-void Cube::print() { 
+void Cube::print(bool color_enabled) { 
     string padding(cubesize * 2 + strlen(FACE_SEPARATOR), ' ');
 
     auto top = getFaceColors(TOP);
     for(int i = 0; i < cubesize; i++) {
         fmt::print("{}", padding);
-        printFace({top[i]});
+        printFace({top[i]}, color_enabled);
     }
 
     std::vector<std::vector<std::vector<string>>> middlefaces;
@@ -349,12 +354,12 @@ void Cube::print() {
         }
     }
     
-    printFace(result);
+    printFace(result, color_enabled);
 
     auto bottom = getFaceColors(BOTTOM);
     for(int i = 0; i < cubesize; i++) {
         fmt::print("{}", padding);
-        printFace({bottom[i]});
+        printFace({bottom[i]}, color_enabled);
     }
 }
 void Cube::reset() {

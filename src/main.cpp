@@ -9,6 +9,7 @@
 
 int main(int argc, char* argv[]) {
     std::string FILEPATH = "";
+    bool color_enabled = true;
     for(int i = 0; i < argc; i++) {
         std::string arg = argv[i];
         if(arg == "--file") {
@@ -17,6 +18,9 @@ int main(int argc, char* argv[]) {
                 return -1;
             }
             FILEPATH = argv[i+1];
+        }
+        if(arg == "--nocolor") {
+            color_enabled = false;
         }
     }
     if(!FILEPATH.empty()) {
@@ -47,7 +51,7 @@ int main(int argc, char* argv[]) {
         Cube cube = Cube(cubesize);
         Algorithm_Reader alg = Algorithm_Reader();
         alg.parse(algorithm, cube);
-        cube.print();
+        cube.print(color_enabled);
         return 0;
     }
     int size;
@@ -61,7 +65,7 @@ int main(int argc, char* argv[]) {
     Cube cube = Cube(size);
     Algorithm_Reader alg = Algorithm_Reader();
     std::string input;
-    cube.print();
+    cube.print(color_enabled);
 
     while(true) {
         std::cout<<"Enter Algorithm: ";
@@ -69,8 +73,7 @@ int main(int argc, char* argv[]) {
         std::cout<<std::endl;
         if(input == "quit") break;
         alg.parse(input, cube);
-        cube.print();
-        std::cout<<States.size()<<std::endl;
+        cube.print(color_enabled);
     }
 
     std::cin.get();

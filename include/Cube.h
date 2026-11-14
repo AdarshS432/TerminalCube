@@ -215,8 +215,8 @@ class Cube {
         using piece_map = std::unordered_map<Eigen::Vector3f, std::unique_ptr<pieces::Piece>, matrix_hash<Eigen::Vector3f>>;
         piece_map Pieces;
 
-        void print();
-        void printFace(std::vector<std::vector<string>> facedata);
+        void print(bool color_enabled);
+        void printFace(std::vector<std::vector<string>> facedata, bool color_enabled);
         std::vector<std::vector<string>> getFaceColors(Enums::FaceEnum face);
         void rotateFace(Enums::FaceEnum face, int amount);
         void rotateLayer(Enums::FaceEnum face, int depth, int amount);
