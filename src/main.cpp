@@ -80,3 +80,42 @@ int main(int argc, char* argv[]) {
     
     return 0;
 }
+/*
+int main() {
+    int max_moves = 3674160;
+
+    const char* FILEPATH = "/home/adarsh/Projects/Cpp/Cube2x2Cases/py/output_characters.txt";
+    Cube cube = Cube(2); 
+    Algorithm_Reader algreader = Algorithm_Reader();
+
+    using piece_map = std::unordered_map<Eigen::Vector3f, std::unique_ptr<pieces::Piece>, matrix_hash<Eigen::Vector3f>>;
+    std::unordered_map<int, piece_map> STATES;
+
+    cube.update_state_on_turns();
+    
+    std::vector<std::string> alg;
+    ifstream file(FILEPATH);
+    if(file.is_open()) {
+        std::string line;
+        while(std::getline(file, line)) {
+            std::istringstream iss(line);
+            std::string move;
+            int count = 0;
+            while(iss >> move && count <= max_moves) {
+                count++;
+                alg.push_back(move);
+            }
+        }
+    } else {
+        std::cerr<<"ERROR: File Could Not Be Opened"<<std::endl;
+        return -1;
+    }
+    int k = 0;
+    for(std::string move : alg) {
+        algreader.parse(move, cube);
+        STATES.emplace(k, cube.get_last_state());
+        std::cout<<k<<std::endl;
+        k++;
+    }
+    return 0;
+}*/

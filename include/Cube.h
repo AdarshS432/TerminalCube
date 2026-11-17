@@ -223,7 +223,7 @@ class Cube {
         void replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f rotationMatrix);
         void replacePieces(pieces::Piece& piece);
 
-        std::unordered_map<int, piece_map> get_states();
+        piece_map get_last_state();
         void set_state(piece_map& state);
 
         void update_state_on_turns();
@@ -238,5 +238,5 @@ class Cube {
         void rotatePiece(pieces::Piece& piece, Eigen::Matrix3f rotationMatrix);
         pieces::Piece* getPieceAtPosition(Eigen::Vector3f pos);
 
-        std::unordered_map<int, piece_map> clone_state(std::unordered_map<int, piece_map>& pieces);
+        piece_map clone_state(piece_map& pieces);
 };
