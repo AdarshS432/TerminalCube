@@ -247,10 +247,10 @@ void Cube::replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f 
 float Cube::getSize() {
     return cubesize;
 }
-Piece* Cube::getPieceAtPosition(Eigen::Vector3f pos) {
+Piece* Cube::getPieceAtPosition(Eigen::Vector3f pos) const {
     return Pieces.at(pos).get();
 }
-std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) {
+std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) const {
     std::vector<std::vector<string>> colors(cubesize, std::vector<string>(cubesize, ""));
     std::vector<string> colorlist;
     Eigen::Vector3f desirednormal = FaceNormals.at(face);
@@ -329,11 +329,11 @@ void Cube::printFace(std::vector<std::vector<string>> facedata, bool color_enabl
         std::cout<<std::endl;
     }
 }
-std::string Cube::getStateColorList() {
+std::string Cube::getStateColorList() const {
     return getStateColorList(Pieces);
 }
 
-std::string Cube::getStateColorList(const piece_map& pieceMap) {
+std::string Cube::getStateColorList(const piece_map& pieceMap) const {
     std::string colorlist;
     auto getFace = [this](FaceEnum face) {
         std::string colors;
