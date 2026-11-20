@@ -329,6 +329,29 @@ void Cube::printFace(std::vector<std::vector<string>> facedata, bool color_enabl
         std::cout<<std::endl;
     }
 }
+std::string Cube::getStateColorList() {
+    return getStateColorList(Pieces);
+}
+
+std::string Cube::getStateColorList(const piece_map& pieceMap) {
+    std::string colorlist;
+    auto getFace = [this](FaceEnum face) {
+        std::string colors;
+        for(auto row : getFaceColors(face)) {
+            for(auto color_word : row) {
+                colors += color_word[0];
+            }
+        }
+        return colors;
+    };
+    getFace(TOP);
+    getFace(LEFT);
+    getFace(FRONT);
+    getFace(RIGHT);
+    getFace(BACK);
+    getFace(BOTTOM);
+    return colorlist;
+}
 
 void Cube::print(bool color_enabled) { 
     string padding(cubesize * 2 + strlen(FACE_SEPARATOR), ' ');

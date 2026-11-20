@@ -218,6 +218,10 @@ class Cube {
         void print(bool color_enabled);
         void printFace(std::vector<std::vector<string>> facedata, bool color_enabled);
         std::vector<std::vector<string>> getFaceColors(Enums::FaceEnum face);
+
+        std::string getStateColorList();
+        std::string getStateColorList(const piece_map& pieceMap);
+
         void rotateFace(Enums::FaceEnum face, int amount);
         void rotateLayer(Enums::FaceEnum face, int depth, int amount);
         void replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f rotationMatrix);
