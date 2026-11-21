@@ -217,7 +217,7 @@ class Cube {
 
         void print(bool color_enabled);
         void printFace(std::vector<std::vector<string>> facedata, bool color_enabled);
-        std::vector<std::vector<string>> getFaceColors(Enums::FaceEnum face) const;
+        std::vector<std::vector<string>> getFaceColors(Enums::FaceEnum face, const piece_map& pieces) const;
 
         std::string getStateColorList() const;
         std::string getStateColorList(const piece_map& pieceMap) const;
@@ -240,7 +240,7 @@ class Cube {
 
         Eigen::Matrix3f buildRotationMatrix(Eigen::Vector3f axis, float angle);
         void rotatePiece(pieces::Piece& piece, Eigen::Matrix3f rotationMatrix);
-        pieces::Piece* getPieceAtPosition(Eigen::Vector3f pos) const;
+        pieces::Piece* getPieceAtPosition(Eigen::Vector3f pos, const piece_map& pieces) const;
 
         piece_map clone_state(piece_map& pieces);
 };

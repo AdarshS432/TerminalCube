@@ -177,7 +177,7 @@ void Cube::rotateLayer(Enums::FaceEnum face, int depth, int amount) {
     replaceTargets(targets, rot);
     if(update_external_state) {
         std::lock_guard<std::mutex> lock(state_lock);
-        auto map = this->clone_state(this->states.at(this->states.size() - 1));
+        auto map = this->clone_state(this->Pieces);
         states.insert_or_assign(states.size(), std::move(map));
     }
 }
@@ -222,7 +222,7 @@ void Cube::rotateFace(Enums::FaceEnum face, int amount) {
     replaceTargets(targets, rotationMatrix);
     if(update_external_state) {
         std::lock_guard<std::mutex> lock(state_lock);
-        auto map = this->clone_state(this->states.at(this->states.size() - 1));
+        auto map = this->clone_state(this->Pieces);
         states.insert_or_assign(states.size(), std::move(map));
     }
 }
@@ -247,10 +247,10 @@ void Cube::replaceTargets(std::vector<Eigen::Vector3f> targets, Eigen::Matrix3f 
 float Cube::getSize() {
     return cubesize;
 }
-Piece* Cube::getPieceAtPosition(Eigen::Vector3f pos) const {
-    return Pieces.at(pos).get();
+Piece* Cube::getPieceAtPosition(Eigen::Vector3f pos, const piece_map& pieces) const {
+    return pieces.at(pos).get();
 }
-std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) const {
+std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face, const piece_map& pieces) const {
     std::vector<std::vector<string>> colors(cubesize, std::vector<string>(cubesize, ""));
     std::vector<string> colorlist;
     Eigen::Vector3f desirednormal = FaceNormals.at(face);
@@ -271,7 +271,7 @@ std::vector<std::vector<string>> Cube::getFaceColors(FaceEnum face) const {
             if(face == RIGHT) pos = Eigen::Vector3f(maxpoint, -i, -j);
             if(face == LEFT) pos = Eigen::Vector3f(minpoint, -i, j);//REVERSED
 
-            Piece* p = getPieceAtPosition(pos);
+            Piece* p = getPieceAtPosition(pos, pieces);
             if(p == nullptr) continue;
 
             if (auto* corner = dynamic_cast<Corner*>(p)) {
@@ -335,38 +335,39 @@ std::string Cube::getStateColorList() const {
 
 std::string Cube::getStateColorList(const piece_map& pieceMap) const {
     std::string colorlist;
-    auto getFace = [this](FaceEnum face) {
+    auto getFace = [&](FaceEnum face) {
         std::string colors;
-        for(auto row : getFaceColors(face)) {
+        for(auto row : getFaceColors(face, pieceMap)) {
             for(auto color_word : row) {
                 colors += color_word[0];
             }
         }
         return colors;
     };
-    getFace(TOP);
-    getFace(LEFT);
-    getFace(FRONT);
-    getFace(RIGHT);
-    getFace(BACK);
-    getFace(BOTTOM);
+    colorlist += getFace(TOP);
+    colorlist += getFace(LEFT);
+    colorlist += getFace(FRONT);
+    colorlist += getFace(RIGHT);
+    colorlist += getFace(BACK);
+    colorlist += getFace(BOTTOM);
+    
     return colorlist;
 }
 
 void Cube::print(bool color_enabled) { 
     string padding(cubesize * 2 + strlen(FACE_SEPARATOR), ' ');
 
-    auto top = getFaceColors(TOP);
+    auto top = getFaceColors(TOP, Pieces);
     for(int i = 0; i < cubesize; i++) {
         fmt::print("{}", padding);
         printFace({top[i]}, color_enabled);
     }
 
     std::vector<std::vector<std::vector<string>>> middlefaces;
-    middlefaces.push_back(getFaceColors(LEFT));
-    middlefaces.push_back(getFaceColors(FRONT));
-    middlefaces.push_back(getFaceColors(RIGHT));
-    middlefaces.push_back(getFaceColors(BACK));
+    middlefaces.push_back(getFaceColors(LEFT, Pieces));
+    middlefaces.push_back(getFaceColors(FRONT, Pieces));
+    middlefaces.push_back(getFaceColors(RIGHT, Pieces));
+    middlefaces.push_back(getFaceColors(BACK, Pieces));
     
     std::vector<std::vector<string>> result(cubesize, std::vector<string>(cubesize * 4, ""));
     for(int row = 0; row < cubesize; row++) {
@@ -379,7 +380,7 @@ void Cube::print(bool color_enabled) {
     
     printFace(result, color_enabled);
 
-    auto bottom = getFaceColors(BOTTOM);
+    auto bottom = getFaceColors(BOTTOM, Pieces);
     for(int i = 0; i < cubesize; i++) {
         fmt::print("{}", padding);
         printFace({bottom[i]}, color_enabled);
